@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="smartimagecrop.ImageCropController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="129.0" minHeight="0.0" percentHeight="5.0" prefHeight="14.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="355.0" minHeight="10.0" percentHeight="50.0" prefHeight="101.04347826086953" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="281.5652173913044" minHeight="10.0" percentHeight="50.0" prefHeight="281.5652173913044" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <Label prefHeight="12.0" prefWidth="300.0" style="-fx-background-color: #275B76; -fx-text-fill: white;" text="Smart Image Crop - By SanderDL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets left="30.0" />
+               </padding>
+               <font>
+                  <Font name="Calibri" size="12.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0" style="-fx-background-color: white; -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );;" GridPane.rowIndex="1">
+         <children>
+            <Button fx:id="btnLoadImages" mnemonicParsing="false" onAction="#btnLoadImagesClick" prefHeight="25.0" prefWidth="113.0" text="Load images">
+               <VBox.margin>
+                  <Insets left="15.0" top="10.0" />
+               </VBox.margin>
+            </Button>
+            <CheckBox fx:id="cbFolders" mnemonicParsing="false" selected="true" text="Include subfolders?">
+               <VBox.margin>
+                  <Insets left="15.0" />
+               </VBox.margin>
+            </CheckBox>
+            <Label fx:id="laLoaded" text="Load images to get started">
+               <VBox.margin>
+                  <Insets left="15.0" />
+               </VBox.margin>
+            </Label>
+         </children>
+         <GridPane.margin>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </GridPane.margin>
+      </VBox>
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0" style="-fx-background-color: white; -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );;" GridPane.rowIndex="2">
+         <children>
+            <Button fx:id="btnCrop" disable="true" mnemonicParsing="false" onAction="#btnCropClick" prefHeight="25.0" prefWidth="113.0" text="Crop">
+               <VBox.margin>
+                  <Insets left="15.0" top="10.0" />
+               </VBox.margin>
+            </Button>
+            <ProgressBar fx:id="pbProgress" prefHeight="18.0" prefWidth="258.0" progress="0.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <VBox.margin>
+                  <Insets left="15.0" right="15.0" />
+               </VBox.margin>
+            </ProgressBar>
+            <Label fx:id="laProgress" text="Waiting . . .">
+               <VBox.margin>
+                  <Insets left="15.0" />
+               </VBox.margin>
+            </Label>
+         </children>
+         <GridPane.margin>
+            <Insets bottom="15.0" left="15.0" right="15.0" />
+         </GridPane.margin>
+      </VBox>
+   </children>
+</GridPane>

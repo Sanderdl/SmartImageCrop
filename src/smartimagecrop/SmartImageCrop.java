@@ -5,6 +5,9 @@
  */
 package smartimagecrop;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,8 +21,20 @@ import javafx.stage.Stage;
 public class SmartImageCrop extends Application {
     
     @Override
-    public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+    public void start(Stage stage) {
+        
+        Parent root = null;
+        
+        double minSize = 300;
+        
+        stage.setMinHeight(minSize);
+        stage.setMinWidth(minSize);
+        
+        try {
+            root = FXMLLoader.load(getClass().getResource("ImageCrop.fxml"));
+        } catch (IOException ex) {
+            Logger.getLogger(SmartImageCrop.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         Scene scene = new Scene(root);
         
