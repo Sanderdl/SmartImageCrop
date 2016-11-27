@@ -43,6 +43,31 @@ public class ImageProcessor {
         controller.setLoadedText("Loaded "+ Images.length + " images to process.");
     }
     
+    public void smartCropImages(){
+        int[] sizes = calculateSmallestPossibleSize();
+        System.out.println(sizes[0]);
+        System.out.println(sizes[1]);
+    }
+    
+    private int [] calculateSmallestPossibleSize(){
+        int[] sizes = new int[2];
+        
+        CalculateSizeTask sizeTask = new CalculateSizeTask(Images);
+        pool.submit(sizeTask);
+        
+        try {
+            sizes = sizeTask.get();
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(ImageProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return sizes;
+    }
+    
+    private void cropAndSaveImages(){
+        
+    }
+    
     public void close(){
         pool.shutdown();
     }

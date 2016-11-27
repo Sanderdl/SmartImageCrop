@@ -61,7 +61,7 @@ public class ImageCropController implements Initializable{
     
     @FXML
     private void btnCropClick(ActionEvent event){
-        System.out.println("crop");
+        imageProcessor.smartCropImages();
     }
 
     public void setUpController(Stage stage, Application application) {
