@@ -45,12 +45,13 @@ public class ImageProcessor {
     
     public void smartCropImages(){
         int[] sizes = calculateSmallestPossibleSize();
-        System.out.println(sizes[0]);
-        System.out.println(sizes[1]);
+        cropAndSaveImages(sizes[0], sizes[1], sizes[2], sizes[3]);
+        controller.setProgressText("Cropping completed!");
     }
     
     private int [] calculateSmallestPossibleSize(){
-        int[] sizes = new int[2];
+        controller.setProgressText("Calculating smallest possible size...");
+        int[] sizes = new int[4];
         
         CalculateSizeTask sizeTask = new CalculateSizeTask(Images);
         pool.submit(sizeTask);
@@ -64,8 +65,16 @@ public class ImageProcessor {
         return sizes;
     }
     
-    private void cropAndSaveImages(){
+    private void cropAndSaveImages(int width, int height , int x, int y ){
+        controller.setProgressText("Cropping images...");
+        ImageCropTask cropTask = new ImageCropTask(Images, width, height, x, y);
+        pool.submit(cropTask);
         
+        try {
+            boolean succes = cropTask.get();
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(ImageProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void close(){

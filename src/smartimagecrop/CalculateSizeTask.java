@@ -25,23 +25,31 @@ public class CalculateSizeTask extends Task<int[]> {
 
     @Override
     protected int[] call() {
-        int[] minSizes = new int[2];
+        int[] minSizes = new int[4];
         
         int minWidth = 0;
         int minHeight = 0;
+        int startX = 0;
+        int startY = 0;
         
         for (File f : images) {
            int[] sizes = neededSize(f);
            
-           if (sizes[0] > minWidth)
+           if (sizes[0] > minWidth){
                minWidth = sizes[0];
+               startX = sizes[2];
+           }
            
-           if (sizes[1] > minHeight)
+           if (sizes[1] > minHeight){
                minHeight = sizes[1];
+               startY = sizes[3];
+           }
         }
         
         minSizes[0] = minWidth;
         minSizes[1] = minHeight;
+        minSizes[2] = startX;
+        minSizes[3] = startY;
         
         return minSizes;
     }
@@ -79,9 +87,11 @@ public class CalculateSizeTask extends Task<int[]> {
         width = width - x1;
         height = height - y1;
         
-        int[] sizes = new int[2];
+        int[] sizes = new int[4];
         sizes[0] = width;
         sizes[1] = height;
+        sizes[2] = x1;
+        sizes[3] = y1;
 
         return sizes;
     }
