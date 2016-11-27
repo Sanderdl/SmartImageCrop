@@ -13,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -21,21 +22,27 @@ import javafx.stage.Stage;
  *
  * @author Sander
  */
-public class ImageCropController implements Initializable, IControllerParent{
+public class ImageCropController implements Initializable{
     
     @FXML
     private Label laLoaded;
     @FXML
-    private Button btnCrop;
+    private Button btnCrop;  
+    @FXML
+    private Label laProgress;
+    @FXML
+    private CheckBox cbFolders;
     
     private Stage stage;
     private Application application;
     
-    private final static String NotLoadedText = "Images were not loaded.";  
+    private ImageProcessor imageProcessor;
+    
+    private final static String NotLoadedText = "No images were loaded";  
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
+        imageProcessor = new ImageProcessor(this);
     }
     
     @FXML
@@ -47,7 +54,7 @@ public class ImageCropController implements Initializable, IControllerParent{
         btnCrop.setDisable(imageFolder == null);
         
         if (imageFolder != null){
-            
+           imageProcessor.loadImages(imageFolder.getPath(), cbFolders.isSelected());
         }else
             laLoaded.setText(NotLoadedText);
     }
@@ -57,14 +64,21 @@ public class ImageCropController implements Initializable, IControllerParent{
         System.out.println("crop");
     }
 
-    @Override
-    public void setControllerParent(Stage stage) {
+    public void setUpController(Stage stage, Application application) {
         this.stage = stage;
-    }
-
-    @Override
-    public void shareApplication(Application application) {
         this.application = application;
+    }
+    
+    public void setLoadedText(String text){
+        laLoaded.setText(text);
+    }
+    
+    public void setProgressText(String text){
+        laProgress.setText(text);
+    }
+    
+    public void close(){
+        imageProcessor.close();
     }
             
     

@@ -9,10 +9,12 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  *
@@ -20,21 +22,31 @@ import javafx.stage.Stage;
  */
 public class SmartImageCrop extends Application {
     
+    private ImageCropController imc;
+    
     @Override
     public void start(Stage stage) {
         
         Parent root = null;
         
-        double minSize = 300;
+        final double minSize = 300;
         
         stage.setMinHeight(minSize);
         stage.setMinWidth(minSize);
         
         try {
-            root = FXMLLoader.load(getClass().getResource("ImageCrop.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ImageCrop.fxml"));
+            root = (Parent)loader.load();
+            imc = (ImageCropController)loader.getController();
+            
+            imc.setUpController(stage, this);
         } catch (IOException ex) {
             Logger.getLogger(SmartImageCrop.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        stage.setOnCloseRequest((WindowEvent we) -> {
+            imc.close();
+        });
         
         Scene scene = new Scene(root);
         
