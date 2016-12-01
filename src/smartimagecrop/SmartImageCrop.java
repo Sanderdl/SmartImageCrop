@@ -29,17 +29,19 @@ public class SmartImageCrop extends Application {
         
         Parent root = null;
         
-        final double minSize = 300;
+        final double minSizeX = 300;
+        final double minSizeY = 500;
         
-        stage.setMinHeight(minSize);
-        stage.setMinWidth(minSize);
+        stage.setMinHeight(minSizeY);
+        stage.setMinWidth(minSizeX);
+        stage.setResizable(false);
         
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("ImageCrop.fxml"));
             root = (Parent)loader.load();
             imc = (ImageCropController)loader.getController();
             
-            imc.setUpController(stage, this);
+            imc.setUpController(stage);
         } catch (IOException ex) {
             Logger.getLogger(SmartImageCrop.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -49,7 +51,7 @@ public class SmartImageCrop extends Application {
         });
         
         Scene scene = new Scene(root);
-        
+
         stage.setScene(scene);
         stage.show();
     }

@@ -6,6 +6,7 @@
 package smartimagecrop;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
 import javafx.concurrent.Task;
@@ -22,13 +23,16 @@ public class ImageCropTask extends Task<Boolean>{
     private final int height;
     private final int startX;
     private final int startY;
+    private final boolean override;
     
-    public ImageCropTask(File[] images, int width, int height, int startX, int startY){
+    public ImageCropTask(File[] images, int width, int height,
+            int startX, int startY, boolean override){
         this.images = images;
         this.width = width;
         this.height = height;
         this.startX = startX;
         this.startY = startY;
+        this.override = override;
     }
     
     @Override
@@ -42,25 +46,30 @@ public class ImageCropTask extends Task<Boolean>{
     private void crop(File f) {
         try {
             BufferedImage originalImgage = ImageIO.read(f);
-            
-            System.out.println(startX);
-            System.out.println(startY);
-
+                        
             BufferedImage SubImgage = originalImgage.getSubimage(startX, startY, width, height);
-            System.out.println("Cropped Image Dimension: " + SubImgage.getWidth() + "x" + SubImgage.getHeight());
             
-            String oldDir = f.getPath();
-            String newDir = oldDir.substring(0,oldDir.lastIndexOf(File.separator)+1);
-            String newFile = f.getName().substring(0, f.getName().lastIndexOf("."));
+            File outputfile = null;
+            if (!override) {
+                String oldDir = f.getPath();
+                String newDir = oldDir.substring(0, oldDir.lastIndexOf(File.separator) + 1);
+                String newFile = f.getName().substring(0, f.getName().lastIndexOf("."));
+
+                outputfile = new File(newDir + newFile + "_cropped.png");
+            }else
+                outputfile = new File(f.getPath());
             
-            File outputfile = new File(newDir+newFile +"_cropped.png");
             ImageIO.write(SubImgage, "png", outputfile);
 
             System.out.println("Image cropped successfully: " + outputfile.getPath());
 
         } catch (IOException e) {
-            System.out.println("messed up");
+            System.out.println(f.getPath()+ " could not be loaded.");
+        }catch (RasterFormatException e){
+            System.out.println(f.getPath()+" was not the same size, image was not cropped.");
         }
+        
     }
+    
     
 }

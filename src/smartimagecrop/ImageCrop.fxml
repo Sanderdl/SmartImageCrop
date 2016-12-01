@@ -6,7 +6,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="smartimagecrop.ImageCropController">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="smartimagecrop.ImageCropController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
   </columnConstraints>
@@ -43,6 +43,16 @@
                   <Insets left="15.0" />
                </VBox.margin>
             </CheckBox>
+            <CheckBox fx:id="cbOverride" mnemonicParsing="false" text="Override original images?">
+               <VBox.margin>
+                  <Insets left="15.0" />
+               </VBox.margin>
+            </CheckBox>
+            <TextField promptText="Image Prefix">
+               <VBox.margin>
+                  <Insets left="15.0" right="15.0" />
+               </VBox.margin>
+            </TextField>
             <Label fx:id="laLoaded" text="Load images to get started">
                <VBox.margin>
                   <Insets left="15.0" />
@@ -60,7 +70,7 @@
                   <Insets left="15.0" top="10.0" />
                </VBox.margin>
             </Button>
-            <ProgressBar fx:id="pbProgress" prefHeight="18.0" prefWidth="258.0" progress="0.0">
+            <ProgressBar fx:id="pbProgress" prefHeight="18.0" prefWidth="355.0" progress="0.0">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
@@ -73,6 +83,11 @@
                   <Insets left="15.0" />
                </VBox.margin>
             </Label>
+            <TextArea editable="false" prefHeight="200.0" prefWidth="200.0">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="15.0" right="15.0" />
+               </VBox.margin>
+            </TextArea>
          </children>
          <GridPane.margin>
             <Insets bottom="15.0" left="15.0" right="15.0" />

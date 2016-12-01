@@ -32,9 +32,10 @@ public class ImageCropController implements Initializable{
     private Label laProgress;
     @FXML
     private CheckBox cbFolders;
+    @FXML
+    private CheckBox cbOverride;
     
     private Stage stage;
-    private Application application;
     
     private ImageProcessor imageProcessor;
     
@@ -64,9 +65,8 @@ public class ImageCropController implements Initializable{
         imageProcessor.smartCropImages();
     }
 
-    public void setUpController(Stage stage, Application application) {
+    public void setUpController(Stage stage) {
         this.stage = stage;
-        this.application = application;
     }
     
     public void setLoadedText(String text){
@@ -80,6 +80,9 @@ public class ImageCropController implements Initializable{
     public void close(){
         imageProcessor.close();
     }
-            
+    
+    public boolean getOverrideImages(){
+        return cbOverride.isSelected();
+    }
     
 }

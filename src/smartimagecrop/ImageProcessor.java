@@ -67,7 +67,7 @@ public class ImageProcessor {
     
     private void cropAndSaveImages(int width, int height , int x, int y ){
         controller.setProgressText("Cropping images...");
-        ImageCropTask cropTask = new ImageCropTask(Images, width, height, x, y);
+        ImageCropTask cropTask = new ImageCropTask(Images, width, height, x, y, controller.getOverrideImages());
         pool.submit(cropTask);
         
         try {
