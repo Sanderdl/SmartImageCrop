@@ -8,6 +8,12 @@ package smartimagecrop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javax.imageio.ImageIO;
 
@@ -15,12 +21,17 @@ import javax.imageio.ImageIO;
  *
  * @author Sander
  */
-public class CalculateSizeTask extends Task<int[]> {
+public class CalculateSizeTask extends Task<int[]>{
 
     private final File[] images;
+    private final int maxProgress;
+    private int progress = 0;
+    private final CyclicBarrier cb;
 
-    public CalculateSizeTask(File[] images) {
+    public CalculateSizeTask(File[] images, CyclicBarrier cb) {
         this.images = images;
+        this.maxProgress = images.length * 2;
+        this.cb = cb;
     }
 
     @Override
@@ -44,13 +55,15 @@ public class CalculateSizeTask extends Task<int[]> {
                minHeight = sizes[1];
                startY = sizes[3];
            }
+            progress++;
+            updateProgress(progress, maxProgress);         
         }
         
         minSizes[0] = minWidth;
         minSizes[1] = minHeight;
         minSizes[2] = startX;
         minSizes[3] = startY;
-        
+              
         return minSizes;
     }
 
@@ -100,5 +113,15 @@ public class CalculateSizeTask extends Task<int[]> {
         int pixel = img.getRGB(x, y);
         return (pixel >> 24) == 0x00;
     }
-
+    
+    @Override
+    protected void done() {
+        try {
+            cb.await();
+        }
+        catch (InterruptedException | BrokenBarrierException ex) {
+            Logger.getLogger(CalculateSizeTask.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+       
 }

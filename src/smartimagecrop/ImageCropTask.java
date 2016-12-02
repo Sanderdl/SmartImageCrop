@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
  *
  * @author Sander
  */
-public class ImageCropTask extends Task<Boolean>{
+public class ImageCropTask extends Task<Void>{
     
     private final File[] images;
     private final int width;
@@ -24,6 +24,8 @@ public class ImageCropTask extends Task<Boolean>{
     private final int startX;
     private final int startY;
     private final boolean override;
+    private final int maxProgress;
+    private int progress;
     
     public ImageCropTask(File[] images, int width, int height,
             int startX, int startY, boolean override){
@@ -33,14 +35,18 @@ public class ImageCropTask extends Task<Boolean>{
         this.startX = startX;
         this.startY = startY;
         this.override = override;
+        this.maxProgress = images.length * 2;
+        this.progress = images.length;
     }
     
     @Override
-    protected Boolean call(){
+    protected Void call(){
         for(File f : images){
             crop(f);
+            progress++;
+            updateProgress(progress, maxProgress);
         }
-        return true;
+        return null;
     }
     
     private void crop(File f) {

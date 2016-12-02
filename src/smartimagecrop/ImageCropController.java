@@ -8,13 +8,13 @@ package smartimagecrop;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -27,13 +27,17 @@ public class ImageCropController implements Initializable{
     @FXML
     private Label laLoaded;
     @FXML
-    private Button btnCrop;  
+    private Button btnCrop;
+    @FXML
+    private Button btnLoadImages;
     @FXML
     private Label laProgress;
     @FXML
     private CheckBox cbFolders;
     @FXML
     private CheckBox cbOverride;
+    @FXML
+    private ProgressBar pbProgress;
     
     private Stage stage;
     
@@ -62,6 +66,7 @@ public class ImageCropController implements Initializable{
     
     @FXML
     private void btnCropClick(ActionEvent event){
+        btnLoadImages.setDisable(true);
         imageProcessor.smartCropImages();
     }
 
@@ -83,6 +88,10 @@ public class ImageCropController implements Initializable{
     
     public boolean getOverrideImages(){
         return cbOverride.isSelected();
+    }
+    
+    public ProgressBar getProgressBar(){
+        return pbProgress;
     }
     
 }

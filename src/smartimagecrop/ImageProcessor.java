@@ -6,11 +6,13 @@
 package smartimagecrop;
 
 import java.io.File;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 
 /**
  *
@@ -21,7 +23,11 @@ public class ImageProcessor {
     private final ImageCropController controller;
     private final ExecutorService pool;
     
+    private CalculateSizeTask sizeTask;
+    private ImageCropTask cropTask;
+    
     private File[] Images;
+    private int[] sizes;
     
     public ImageProcessor(ImageCropController controller){
         this.controller = controller;
@@ -44,37 +50,61 @@ public class ImageProcessor {
     }
     
     public void smartCropImages(){
-        int[] sizes = calculateSmallestPossibleSize();
-        cropAndSaveImages(sizes[0], sizes[1], sizes[2], sizes[3]);
-        controller.setProgressText("Cropping completed!");
+        unbind();
+        
+        CyclicBarrier cbCalculate;
+        cbCalculate = new CyclicBarrier(1, new Runnable() {
+            @Override
+            public void run() {
+                sizes = new int[4];
+                try {
+                    sizes = sizeTask.get();
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            cropAndSaveImages(sizes[0], sizes[1], sizes[2], sizes[3]);
+                        }
+                    });
+                    
+                } catch (InterruptedException | ExecutionException ex) {
+                    Logger.getLogger(ImageProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
+                }
+            }
+        });
+        
+        calculateSmallestPossibleSize(cbCalculate);
+
     }
     
-    private int [] calculateSmallestPossibleSize(){
+    private void calculateSmallestPossibleSize(CyclicBarrier cb){
         controller.setProgressText("Calculating smallest possible size...");
-        int[] sizes = new int[4];
+       
+        sizeTask = new CalculateSizeTask(Images, cb);
+        setSizeBind();
         
-        CalculateSizeTask sizeTask = new CalculateSizeTask(Images);
         pool.submit(sizeTask);
         
-        try {
-            sizes = sizeTask.get();
-        } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(ImageProcessor.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return sizes;
     }
     
     private void cropAndSaveImages(int width, int height , int x, int y ){
-        controller.setProgressText("Cropping images...");
-        ImageCropTask cropTask = new ImageCropTask(Images, width, height, x, y, controller.getOverrideImages());
+        
+        cropTask = new ImageCropTask(Images, width, height, x, y, controller.getOverrideImages());
+        setCropBind();
         pool.submit(cropTask);
         
-        try {
-            boolean succes = cropTask.get();
-        } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(ImageProcessor.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    }
+    
+    private void setSizeBind(){
+        controller.getProgressBar().progressProperty().bind(sizeTask.progressProperty());
+    }
+    
+    private void setCropBind(){
+        controller.getProgressBar().progressProperty().bind(cropTask.progressProperty());
+    }
+    
+    private void unbind(){
+        controller.getProgressBar().progressProperty().unbind();
     }
     
     public void close(){
