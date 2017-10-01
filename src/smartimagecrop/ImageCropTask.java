@@ -6,12 +6,13 @@
 package smartimagecrop;
 
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javax.imageio.ImageIO;
 
@@ -22,26 +23,28 @@ import javax.imageio.ImageIO;
 public class ImageCropTask extends Task<Void> {
 
     private final File[] images;
-    private final boolean override;
     private final int maxProgress;
     private int progress;
     private final SizeResult sizes;
+    private final ImageCropController controller;
 
-    public ImageCropTask(File[] images, SizeResult sizes, boolean override) {
+    public ImageCropTask(File[] images, SizeResult sizes, ImageCropController controller) {
         this.images = images;
         this.sizes = sizes;
-        this.override = override;
         this.maxProgress = images.length * 2;
         this.progress = images.length;
+        this.controller = controller;
     }
 
     @Override
     protected Void call() {
+        updateMessage("Cropping and saving images...");
         for (int i = 0; i < images.length; i++) {
             crop(images[i], i);
             progress++;
             updateProgress(progress, maxProgress);
         }
+        updateMessage("Cropping complete");
         return null;
     }
 
@@ -51,20 +54,17 @@ public class ImageCropTask extends Task<Void> {
 
             Integer[] size = sizes.getPadding(i);
 
-            int startX = originalImgage.getWidth() - size[2];
-            int startY = originalImgage.getHeight() - size[3];
-
             BufferedImage SubImgage = originalImgage.getSubimage(
                     size[2], size[3], size[0], size[1]
             );
-            
+
             int difX = sizes.getMinWidth() - size[0];
             int difY = sizes.getMinHeight() - size[1];
-            
+
             BufferedImage resized = resize(SubImgage, difX, difY);
 
-            File outputfile = null;
-            if (!override) {
+            File outputfile;
+            if (!controller.getOverrideImages()) {
                 String oldDir = f.getPath();
                 String newDir = oldDir.substring(0, oldDir.lastIndexOf(File.separator) + 1);
                 String newFile = f.getName().substring(0, f.getName().lastIndexOf("."));
@@ -76,32 +76,56 @@ public class ImageCropTask extends Task<Void> {
 
             ImageIO.write(resized, "png", outputfile);
 
-            System.out.println("Image cropped successfully: " + outputfile.getPath());
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    controller.sendMessage("Image cropped successfully: " + outputfile.getPath());
+                }
+            });
 
         } catch (IOException e) {
-            System.out.println(f.getPath() + " could not be loaded.");
+            Logger.getLogger(ImageCropTask.class.getName()).log(Level.SEVERE, null, e);
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    controller.sendMessage(f.getPath() + " could not be loaded.");
+                }
+            });
+
         } catch (RasterFormatException e) {
-            System.out.println(f.getPath() + " was not the same size, image was not cropped.");
+
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    controller.sendMessage(f.getPath() + " was not the same size, image was not cropped.");
+                }
+            });
+            Logger.getLogger(ImageCropTask.class.getName()).log(Level.SEVERE, null, e);
         }
 
     }
 
     private BufferedImage resize(BufferedImage image, int diffX, int diffY) {
-        BufferedImage bufferedImage = new BufferedImage(sizes.getMinWidth(), 
+        BufferedImage bufferedImage = new BufferedImage(sizes.getMinWidth(),
                 sizes.getMinHeight(), BufferedImage.TYPE_INT_ARGB);
 
-        // Create a graphics contents on the buffered image
         Graphics2D g2d = bufferedImage.createGraphics();
 
-        // Draw graphics
-        //g2d.setComposite(AlphaComposite.Clear);
-        g2d.drawImage(image, diffX/2, diffY, null);
-        
+        g2d.drawImage(image, diffX / 2, diffY, null);
 
-        // Graphics context no longer needed so dispose it
         g2d.dispose();
 
         return bufferedImage;
+    }
+
+    @Override
+    protected void succeeded() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                controller.resetButtons();
+            }
+        });
     }
 
 }

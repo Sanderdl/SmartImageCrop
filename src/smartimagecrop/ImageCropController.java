@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -38,12 +39,14 @@ public class ImageCropController implements Initializable{
     private CheckBox cbOverride;
     @FXML
     private ProgressBar pbProgress;
+    @FXML
+    private TextArea taMessages;
     
     private Stage stage;
     
     private ImageProcessor imageProcessor;
     
-    private final static String NotLoadedText = "No images were loaded";  
+    private final static String NOTLOADEDTEXT = "No images were loaded";  
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -61,7 +64,7 @@ public class ImageCropController implements Initializable{
         if (imageFolder != null){
            imageProcessor.loadImages(imageFolder.getPath(), cbFolders.isSelected());
         }else
-            laLoaded.setText(NotLoadedText);
+            laLoaded.setText(NOTLOADEDTEXT);
     }
     
     @FXML
@@ -92,6 +95,19 @@ public class ImageCropController implements Initializable{
     
     public ProgressBar getProgressBar(){
         return pbProgress;
+    }
+
+    public Label getProgressLabel() {
+        return laProgress;
+    }
+        
+    public void sendMessage(String message){
+        taMessages.appendText(message + "\n");
+    }
+    
+    public void resetButtons(){
+        btnCrop.setDisable(true);
+        btnLoadImages.setDisable(false);
     }
     
 }

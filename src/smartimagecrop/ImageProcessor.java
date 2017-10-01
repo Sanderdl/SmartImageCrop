@@ -86,8 +86,8 @@ public class ImageProcessor {
     }
     
     private void cropAndSaveImages(){
-        controller.setProgressText("Cropping and saving images...");
-        cropTask = new ImageCropTask(Images, sizes, controller.getOverrideImages());
+        cropTask = new ImageCropTask(Images, sizes, controller);
+        unbind();
         setCropBind();
         pool.submit(cropTask);
         
@@ -99,10 +99,12 @@ public class ImageProcessor {
     
     private void setCropBind(){
         controller.getProgressBar().progressProperty().bind(cropTask.progressProperty());
+        controller.getProgressLabel().textProperty().bind(cropTask.messageProperty());
     }
     
     private void unbind(){
         controller.getProgressBar().progressProperty().unbind();
+        controller.getProgressLabel().textProperty().unbind();
     }
     
     public void close(){
