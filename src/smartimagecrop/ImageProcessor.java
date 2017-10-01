@@ -27,8 +27,7 @@ public class ImageProcessor {
     private ImageCropTask cropTask;
     
     private File[] Images;
-    private int[] sizes;
-    
+    private SizeResult sizes;
     public ImageProcessor(ImageCropController controller){
         this.controller = controller;
         this.pool = Executors.newSingleThreadExecutor();
@@ -56,13 +55,12 @@ public class ImageProcessor {
         cbCalculate = new CyclicBarrier(1, new Runnable() {
             @Override
             public void run() {
-                sizes = new int[4];
                 try {
                     sizes = sizeTask.get();
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            cropAndSaveImages(sizes[0], sizes[1], sizes[2], sizes[3]);
+                            cropAndSaveImages();
                         }
                     });
                     
@@ -87,9 +85,9 @@ public class ImageProcessor {
         
     }
     
-    private void cropAndSaveImages(int width, int height , int x, int y ){
-        
-        cropTask = new ImageCropTask(Images, width, height, x, y, controller.getOverrideImages());
+    private void cropAndSaveImages(){
+        controller.setProgressText("Cropping and saving images...");
+        cropTask = new ImageCropTask(Images, sizes, controller.getOverrideImages());
         setCropBind();
         pool.submit(cropTask);
         

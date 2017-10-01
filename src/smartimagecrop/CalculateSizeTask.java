@@ -8,8 +8,7 @@ package smartimagecrop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.HashSet;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
@@ -21,57 +20,53 @@ import javax.imageio.ImageIO;
  *
  * @author Sander
  */
-public class CalculateSizeTask extends Task<int[]>{
+public class CalculateSizeTask extends Task<SizeResult>{
 
     private final File[] images;
     private final int maxProgress;
     private int progress = 0;
     private final CyclicBarrier cb;
+    private final SizeResult result;
 
     public CalculateSizeTask(File[] images, CyclicBarrier cb) {
         this.images = images;
         this.maxProgress = images.length * 2;
         this.cb = cb;
+        this.result = new SizeResult();
     }
 
     @Override
-    protected int[] call() {
-        int[] minSizes = new int[4];
-        
+    protected SizeResult call() {
+
         int minWidth = 0;
         int minHeight = 0;
-        int startX = 0;
-        int startY = 0;
         
         for (File f : images) {
-           int[] sizes = neededSize(f);
+           Integer[] sizes = neededSize(f);
+           result.addPadding(sizes);
            
-           if (sizes[0] > minWidth){
+           if (sizes[0] > minWidth)
                minWidth = sizes[0];
-               startX = sizes[2];
-           }
            
-           if (sizes[1] > minHeight){
+           if (sizes[1] > minHeight)
                minHeight = sizes[1];
-               startY = sizes[3];
-           }
+           
             progress++;
             updateProgress(progress, maxProgress);         
         }
         
-        minSizes[0] = minWidth;
-        minSizes[1] = minHeight;
-        minSizes[2] = startX;
-        minSizes[3] = startY;
+        result.setMinWidth(minWidth);
+        result.setMinHeight(minHeight);
               
-        return minSizes;
+        return result;
     }
 
-    private int[] neededSize(File f) {
+    private Integer[] neededSize(File f) {
         BufferedImage image = null;
         try {
             image = ImageIO.read(f);
         } catch (IOException e) {
+            Logger.getLogger(CalculateSizeTask.class.getName()).log(Level.SEVERE, null, e);
         }
 
         int x1 = image.getWidth();
@@ -100,7 +95,7 @@ public class CalculateSizeTask extends Task<int[]>{
         width = width - x1;
         height = height - y1;
         
-        int[] sizes = new int[4];
+        Integer[] sizes = new Integer[4];
         sizes[0] = width;
         sizes[1] = height;
         sizes[2] = x1;
@@ -115,7 +110,7 @@ public class CalculateSizeTask extends Task<int[]>{
     }
     
     @Override
-    protected void done() {
+    protected void succeeded() {
         try {
             cb.await();
         }
